@@ -1,7 +1,0 @@
-{
-  "name": "diagnostic-ai-root",
-  "private": true,
-  "scripts": {
-    "build": "cd diagnostic-main/client && npm install && npm run build"
-  }
-}
