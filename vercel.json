@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd diagnostic-main/client && npm install && npm run build",
+  "outputDirectory": "diagnostic-main/client/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

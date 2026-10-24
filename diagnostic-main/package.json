@@ -6,6 +6,7 @@
     "db:up": "docker compose up -d postgres",
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "devDependencies": {

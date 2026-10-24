@@ -54,15 +54,17 @@ export function AuthHome() {
     setBusy(true);
     try {
       if (isLogin) {
-        await login(email, password);
-        navigate('/home', { replace: true });
+        const loggedUser = await login(email, password);
+        const dest = loggedUser?.role === 'lab' || email.toLowerCase().includes('lab') ? '/lab' : '/home';
+        navigate(dest, { replace: true });
       } else {
         const payload = role === 'lab'
           ? { email, password, role, fullName, labName }
           : { email, password, role, fullName };
           
-        await register(payload);
-        navigate('/home', { replace: true });
+        const regUser = await register(payload);
+        const dest = regUser?.role === 'lab' || role === 'lab' ? '/lab' : '/home';
+        navigate(dest, { replace: true });
       }
     } catch (err) {
       setError(err.data?.error || err.data?.errors?.[0]?.msg || err.message || (isLogin ? 'Login failed. Please check your credentials.' : 'Registration failed. Check details.'));
@@ -244,6 +246,49 @@ export function AuthHome() {
             {busy ? (isLogin ? 'Authenticating...' : 'Creating Account...') : (isLogin ? 'Sign In' : 'Create Account')}
             {!busy && <ArrowRight className="h-4 w-4" />}
           </button>
+
+          {/* Quick Demo Section */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700/60 mt-4">
+            <p className={`text-[11px] font-bold uppercase tracking-wider text-center mb-3 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+              One-Click Instant Demo
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await login('patient@demo.com', 'password123');
+                    navigate('/home', { replace: true });
+                  } catch {
+                    navigate('/home', { replace: true });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-center flex items-center justify-center gap-1.5 ${theme === 'dark' ? 'bg-slate-700/60 border-slate-600 hover:bg-slate-700 text-sky-300' : 'bg-sky-50 border-sky-200 hover:bg-sky-100 text-sky-800'}`}
+              >
+                🩺 Demo Patient
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await login('lab@demo.com', 'password123');
+                    navigate('/lab', { replace: true });
+                  } catch {
+                    navigate('/lab', { replace: true });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-center flex items-center justify-center gap-1.5 ${theme === 'dark' ? 'bg-slate-700/60 border-slate-600 hover:bg-slate-700 text-indigo-300' : 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-800'}`}
+              >
+                🔬 Demo Lab
+              </button>
+            </div>
+          </div>
         </form>
       </motion.div>
     </div>
