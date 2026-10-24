@@ -4,11 +4,14 @@ AI service: OCR (Tesseract when available), rule-based lab value analysis, simpl
 from __future__ import annotations
 
 import io
+import os
 import re
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="Diagnostic AI Service", version="1.0.0")
@@ -20,6 +23,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+ASSETS_DIR = STATIC_DIR / "assets"
+
+@app.get("/favicon.svg")
+def serve_favicon():
+    fav = STATIC_DIR / "favicon.svg"
+    if fav.exists():
+        return FileResponse(str(fav), media_type="image/svg+xml")
+    raise HTTPException(404, "Not Found")
+
+@app.get("/assets/{filename:path}")
+def serve_asset(filename: str):
+    file_path = ASSETS_DIR / filename
+    if file_path.exists():
+        media_type = "text/css" if filename.endswith(".css") else ("application/javascript" if filename.endswith(".js") else None)
+        return FileResponse(str(file_path), media_type=media_type)
+    raise HTTPException(404, "Asset Not Found")
+
+@app.get("/")
+@app.get("/login")
+@app.get("/register")
+@app.get("/home")
+@app.get("/patient")
+@app.get("/patient/{catchall:path}")
+@app.get("/lab")
+@app.get("/lab/{catchall:path}")
+def serve_spa(catchall: str | None = None):
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file), media_type="text/html")
+    return HTMLResponse("<h1>Transparent Diagnostic System</h1><p>Frontend is ready.</p>")
 
 DISCLAIMER = (
     "This assistant provides general information only and is not medical advice. "
