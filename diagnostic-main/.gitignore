@@ -4,5 +4,11 @@ dist
 .pglite
 uploads
 .DS_Store
-ai-service/.venv/
+# Python virtual environment and cache
+.venv/
 __pycache__/
+*.py[cod]
+
+# Environment secrets
+.env.*
+!.env.example
